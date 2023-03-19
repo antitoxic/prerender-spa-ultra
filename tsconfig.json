@@ -1,7 +1,7 @@
 {
+  // This is for editor integration & base config for all packages
   "extends": "@tsconfig/node16",
   "compilerOptions": {
-    "outDir": "dist",
     "lib": ["es2021", "dom"],
     "strictNullChecks": true,
     "noImplicitAny": true,

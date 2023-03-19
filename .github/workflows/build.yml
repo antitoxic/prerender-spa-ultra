@@ -1,34 +1,18 @@
 name: Build
-on: [push]
+on: [ push ]
 jobs:
-  Explore-GitHub-Actions:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          # Uncomment this if you are testing locally via `act` cli
-          # node-version-file: '.nvmrc'
+#          Uncomment this if you are testing locally via `act` cli
+          node-version-file: '.nvmrc'
           cache: npm
-      - run:
-          echo "🎉 The job was automatically triggered by a ${{
-          github.event_name }} event."
-      - run:
-          echo "🐧 This job is now running on a ${{ runner.os }} server hosted
-          by GitHub!"
-      - run:
-          echo "🔎 The name of your branch is ${{ github.ref }} and your
-          repository is ${{ github.repository }}."
-      - run:
-          echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - name: Get node version
-        run: |
-          node --version
-      - name: Try to build
+      - name: Install
         run: |
           npm install
+      - name: Build
+        run: |
           npm run build
-      - run: echo "🍏 This job's status is ${{ job.status }}."

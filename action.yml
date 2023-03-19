@@ -1,0 +1,11 @@
+name: 'Prerender website'
+description: 'Converts/pre-renders single page application (SPA) into static html files'
+author: 'Anton Stoychev'
+inputs:
+  website_root:
+    required: true
+    description: 'Directory where your /index.html is and where you will get the pre-rendered output'
+runs:
+  using: 'node16'
+  main: 'dist/prerender-github-action/index.js'
+  post-if: success()

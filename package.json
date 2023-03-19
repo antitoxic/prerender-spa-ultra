@@ -4,7 +4,7 @@
   "description": "Crawls & Pre-renders a site",
   "main": "dist/prerender.js",
   "engines": {
-    "node": "16.x"
+    "node": ">=16.x <19"
   },
   "bin": {
     "prerender-spa-ultra": "./dist/cli.js"
@@ -14,7 +14,9 @@
   },
   "scripts": {
     "prepack": "npm run build",
-    "build": "tsc -p ./tsconfig.json"
+    "build": "npm run build:npm && npm run build:github-aciton",
+    "build:npm": "tsc --project ./tsconfig.npm.json",
+    "build:github-aciton": "esbuild src/github-action/prerender-github-action.ts --outfile=dist/prerender-github-action/index.js --bundle --platform=node --target=node16"
   },
   "prettier": {
     "singleQuote": true,
@@ -24,7 +26,9 @@
     "jsxBracketSameLine": true
   },
   "devDependencies": {
+    "@actions/core": "^1.10.0",
     "@tsconfig/node16": "^1.0.3",
+    "esbuild": "^0.17.12",
     "typescript": "^5.0.2"
   }
 }
