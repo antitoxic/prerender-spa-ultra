@@ -1,4 +1,4 @@
-import core from '@actions/core';
+import * as core from '@actions/core';
 
 try {
   // `who-to-greet` input defined in action metadata file

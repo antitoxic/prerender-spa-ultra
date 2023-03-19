@@ -8,7 +8,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           #          Uncomment this if you are testing locally via `act` cli
-          #          node-version-file: '.nvmrc'
+          node-version-file: '.nvmrc'
           cache: npm
       - name: Install
         run: |
