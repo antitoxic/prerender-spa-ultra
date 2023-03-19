@@ -1,7 +1,6 @@
 TODO:
 
 - CLI & args
-- Github action
 
 1. Start local http server in your output dir using:
    ```shell
@@ -40,6 +39,13 @@ TODO:
 - <a name="serverless"></a>**Built with CI/CD & JAMSTACK in mind**
   - Provides configurations for Github Action & Cloudflare pages deployment
   - Targets and uses already available packages on those build images
+
+## Debugging problems
+
+```shell
+PRERENDER_SPA_ULTRA_DEBUG=1 npx prerender-spa-ultra ....
+PRERENDER_SPA_ULTRA_DEBUG=1 <your command that uses this package>
+```
 
 ## Non-goals
 

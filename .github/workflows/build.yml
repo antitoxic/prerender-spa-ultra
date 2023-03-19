@@ -1,5 +1,7 @@
 name: Build
-on: [ push ]
+on:
+  push:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -7,8 +9,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          #          Uncomment this if you are testing locally via `act` cli
-          node-version-file: '.nvmrc'
           cache: npm
       - name: Install
         run: |
@@ -20,4 +20,4 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: actiontest
         with:
-          website_root: '/path/to/the/dist'
+          website_root: 'sarafov'

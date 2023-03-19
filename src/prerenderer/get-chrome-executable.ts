@@ -16,9 +16,13 @@ const UNIX_LOCATIONS = [
 const LINUX_LOCATIONS = ['/snap/bin/chromium'];
 
 const getNodeChromiumPath = () =>
-  new Promise<string>(resolve =>
-    resolve((require('chromium') as { path: string }).path)
-  ).catch(() => false);
+  new Promise<string>(resolve => {
+    // Workaround for esbuild, which we use because github requires
+    // a single file for the github action with all dependencies inlined
+    const requireAlias = require;
+    console.log(requireAlias('chromium'));
+    resolve((requireAlias('chromium') as { path: string }).path);
+  }).catch(() => false);
 
 export const getChromeExecutable = async () => {
   try {

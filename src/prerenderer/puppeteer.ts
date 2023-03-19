@@ -1,4 +1,9 @@
-import puppeteer, { Browser, Page, Viewport } from 'puppeteer-core';
+import puppeteer, {
+  Browser,
+  Page,
+  Viewport,
+  PuppeteerLaunchOptions,
+} from 'puppeteer-core';
 
 import { ResourceType } from 'puppeteer-core/lib/cjs/puppeteer/common/HTTPRequest';
 
@@ -8,10 +13,13 @@ import { isThirdParty } from './known-third-party';
 /**
  * Puppeteer will launch chrome with certain args (list them by .defaultArgs())
  */
-export const getBrowser = async () =>
+export const getBrowser = async (
+  extraBrowserLaunchOptions: Partial<PuppeteerLaunchOptions> = {}
+) =>
   puppeteer.launch({
     executablePath: await getChromeExecutable(),
     waitForInitialPage: false,
+    ...extraBrowserLaunchOptions,
   });
 
 export interface PageOptions {
@@ -74,16 +82,27 @@ export const getLinks = (page: Page): Promise<string[]> =>
   );
 
 /**
- * Custom waiting mechanism, similar to puppeteer's `networkidle2` but able to
- * provide custom time for which to wait after last request is finished
+ * Helper to visit a page & check if network is idle
  */
-export const waitNetworkIdle = (page: Page, idleMs = 150) =>
-  new Promise(resolve => {
+export const goTo = async (page: Page, url: string, idleMs = 150) => {
+  /**
+   * Custom waiting mechanism, similar to puppeteer's `networkidle2` but able to
+   * provide custom time for which to wait after last request is finished
+   */
+  const waitNetworkIdle = new Promise(resolve => {
     let timer: NodeJS.Timeout;
-    page.on('requestfinished', () => {
+    const handleRequestFinished = () => {
       if (timer) {
         clearTimeout(timer);
       }
-      timer = setTimeout(resolve, idleMs);
-    });
+      timer = setTimeout(done, idleMs);
+    };
+    const done = () => {
+      page.off('requestfinished', handleRequestFinished);
+      resolve(true);
+    };
+    page.on('requestfinished', handleRequestFinished);
   });
+  const res = await page.goto(url);
+  return { res, waitNetworkIdle };
+};

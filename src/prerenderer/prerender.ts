@@ -1,15 +1,9 @@
 import * as path from 'path';
-import { Page } from 'puppeteer-core';
+import { Page, PuppeteerLaunchOptions } from 'puppeteer-core';
 
 import { addRateLimit, connectWithPooledObject } from './limit';
 import { log } from './logging';
-import {
-  getBrowser,
-  getLinks,
-  getPage,
-  PageOptions,
-  waitNetworkIdle,
-} from './puppeteer';
+import { getBrowser, getLinks, getPage, goTo, PageOptions } from './puppeteer';
 import { getFilename, writeFile } from './storage';
 
 const trimSlashes = (str: string) => str.replace(/^\/+|\/+$/g, '');
@@ -32,12 +26,12 @@ const getPageInfo = async (
   page: Page,
   url: string
 ): Promise<PageInfo | false> => {
-  const res = await page.goto(url);
+  const { res, waitNetworkIdle } = await goTo(page, url);
   const isHtml = res!.headers()['content-type'].includes('text/html');
   if (!isHtml) {
     return false;
   } else {
-    await waitNetworkIdle(page);
+    await waitNetworkIdle;
     const [htmlSource, renderedHtmlHead, links] = await Promise.all([
       res!.text(),
       page.evaluate(() => new XMLSerializer().serializeToString(document.head)),
@@ -66,10 +60,12 @@ export interface PrerenderUltraOptions {
   getFilename?: (url: string) => string;
   cleanUrl?: (url: string) => string;
   metaPrerenderOnly?: boolean;
+  extraBrowserLaunchOptions?: Partial<PuppeteerLaunchOptions>;
 }
 
 const DEFAULT_OPTIONS = {
   maxConcurrentPages: 3,
+  extraBrowserLaunchOptions: {},
   pageOptions: {
     viewport: { width: 480, height: 850 },
     block: {
@@ -98,7 +94,7 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
     },
   };
   const baseUrl = options.baseUrl || options.startingUrl;
-  const browser = await getBrowser();
+  const browser = await getBrowser(options.extraBrowserLaunchOptions);
 
   const getUrlInfo = addRateLimit(
     connectWithPooledObject(
