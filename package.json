@@ -1,0 +1,30 @@
+{
+  "name": "prerender-spa-ultra",
+  "version": "1.0.0",
+  "description": "Crawls & Pre-renders a site",
+  "main": "dist/prerender.js",
+  "engines": {
+    "node": "16.x"
+  },
+  "bin": {
+    "prerender-spa-ultra": "./dist/cli.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^19.5.2"
+  },
+  "scripts": {
+    "prepack": "npm run build",
+    "build": "tsc -p ./tsconfig.json"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "proseWrap": "always",
+    "arrowParens": "avoid",
+    "trailingComma": "es5",
+    "jsxBracketSameLine": true
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "typescript": "^5.0.2"
+  }
+}
