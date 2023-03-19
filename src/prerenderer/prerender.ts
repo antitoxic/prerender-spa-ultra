@@ -122,6 +122,7 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
     );
   }
   await browser.close();
+  return [...crawled];
 };
 
 export interface PrerenderUrlOptions {

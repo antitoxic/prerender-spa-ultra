@@ -5,7 +5,11 @@ inputs:
   website_root:
     required: true
     description: 'Directory where your /index.html is and where you will get the pre-rendered output'
+  max_concurrent_pages:
+    description: 'Maximum number of parallel page rendering'
+    default: '3'
 runs:
   using: 'node16'
   main: 'dist/prerender-github-action/index.js'
-  post-if: success()
+  icon: 'layout'
+  color: 'green'

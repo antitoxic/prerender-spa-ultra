@@ -2,32 +2,45 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import * as core from '@actions/core';
+import waitOn from 'wait-on';
 
 import { preRenderSite } from '../prerenderer/prerender';
-// import { preRenderSite } from '../prerenderer/prerender';
 
-try {
-  process.env.PRERENDER_SPA_ULTRA_DEBUG = "1"
-  const websiteRoot = core.getInput('website_root');
-  const p2 = spawn(`cd ${websiteRoot} && python3 ${path.join(__dirname, '../../src/prerenderer/http-server.py')}`, {
-    shell: '/bin/bash',
-    stdio: 'inherit',
-  });
-  setTimeout(() => {
-    preRenderSite({
+(async () => {
+  try {
+    const websiteRoot = core.getInput('website_root');
+    const maxConcurrentPages = core.getInput('max_concurrent_pages');
+    const httpServerProcess = spawn(
+      `cd ${websiteRoot} && python3 ${path.join(
+        __dirname,
+        '../../src/prerenderer/http-server.py'
+      )}`,
+      {
+        shell: '/bin/bash',
+        stdio: 'inherit',
+      }
+    );
+
+    await waitOn({
+      resources: ['tcp:8000'],
+      tcpTimeout: 50,
+    });
+
+    const crawled = await preRenderSite({
       startingUrl: 'http://localhost:8000',
+      maxConcurrentPages: Number(maxConcurrentPages),
       outputDir: path.join(process.cwd(), websiteRoot, 'prerender'),
       extraBrowserLaunchOptions: {
-        // --user-data-dir=/foo/bar
-        // args: ['--no-sandbox', '--disable-setuid-sandbox']
-        args: ['--no-sandbox']
-      }
+        /**
+         * github actions run as root and chrome won't start unless we disable sandboxing
+         */
+        args: ['--no-sandbox'],
+      },
     });
-  }, 2000);
-  console.log(`web root: ${websiteRoot}!`);
 
-  const time = new Date().toTimeString();
-  core.setOutput('time', time);
-} catch (error) {
-  core.setFailed((error as Error).message);
-}
+    core.setOutput('crawled', crawled);
+    httpServerProcess.kill();
+  } catch (error) {
+    core.setFailed((error as Error).message);
+  }
+})();
