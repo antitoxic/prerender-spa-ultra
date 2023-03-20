@@ -11,5 +11,6 @@ inputs:
 runs:
   using: 'node16'
   main: 'dist/prerender-github-action/index.js'
+branding:
   icon: 'layout'
   color: 'green'
