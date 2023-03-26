@@ -10,17 +10,18 @@
     "node": ">=16.x <19"
   },
   "bin": {
-    "prerender-spa-ultra": "./dist/cli.js"
+    "prerender-spa-ultra": "./dist/prerenderer/cli.js"
   },
   "dependencies": {
     "puppeteer-core": "^19.5.2"
   },
   "scripts": {
-    "prepack": "npm run build",
-    "build": "npm run build:npm && npm run build:github-aciton",
+    "prepack": "pnpm build",
+    "build": "pnpm build:npm && pnpm build:github-aciton",
     "build:npm": "tsc --project ./tsconfig.npm.json",
     "build:github-aciton": "esbuild src/github-action/prerender-github-action.ts --outfile=dist/prerender-github-action/index.js --bundle --platform=node --target=node16",
-    "dev:github-aciton": "npm run build:github-aciton -- --watch"
+    "dev:github-aciton": "pnpm build:github-aciton --watch",
+    "dev:npm": "pnpm build:npm --watch"
   },
   "prettier": {
     "singleQuote": true,
@@ -31,7 +32,7 @@
   },
   "devDependencies": {
     "@actions/core": "^1.10.0",
-    "@tsconfig/node16": "^1.0.3",
+    "@tsconfig/node16-strictest": "^1.0.4",
     "@types/wait-on": "^5.3.1",
     "esbuild": "^0.17.12",
     "typescript": "^5.0.2",

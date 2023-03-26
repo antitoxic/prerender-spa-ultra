@@ -28,7 +28,7 @@ export const getChromeExecutable = async () => {
   try {
     return await findFirstExistingPath(
       [
-        process.env.CHROME_PATH,
+        process.env['CHROME_PATH'],
         getNodeChromiumPath(),
         ...(platform() === 'darwin' ? OSX_LOCATIONS : []),
         ...UNIX_LOCATIONS,

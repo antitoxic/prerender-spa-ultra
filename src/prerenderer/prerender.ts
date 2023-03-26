@@ -27,7 +27,7 @@ const getPageInfo = async (
   url: string
 ): Promise<PageInfo | false> => {
   const { res, waitNetworkIdle } = await goTo(page, url);
-  const isHtml = res!.headers()['content-type'].includes('text/html');
+  const isHtml = res!.headers()['content-type']?.includes('text/html');
   if (!isHtml) {
     return false;
   } else {
@@ -50,6 +50,7 @@ export interface PrerenderUltraOptions {
   baseUrl?: string;
   outputDir: string;
   pageOptions?: PageOptions;
+  generateSitemapUsingCanonicalBaseUrl?: string;
   sitemapOptions?: {
     outputDir: string;
     canonicalBaseUrl: string;
@@ -113,12 +114,18 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
     ...(options.cleanUrl && { cleanUrl: options.cleanUrl }),
   });
 
-  if (options.sitemapOptions) {
+  if (options.generateSitemapUsingCanonicalBaseUrl) {
     log(`saving sitemap...`);
-    const { outputDir, canonicalBaseUrl } = options.sitemapOptions;
     await writeFile(
-      path.join(outputDir, 'sitemap.txt'),
-      [...crawled].map(url => url.replace(baseUrl, canonicalBaseUrl)).join('\n')
+      path.join(options.outputDir, 'sitemap.txt'),
+      [...crawled]
+        .map(url =>
+          url.replace(
+            baseUrl,
+            options.generateSitemapUsingCanonicalBaseUrl as string
+          )
+        )
+        .join('\n')
     );
   }
   await browser.close();

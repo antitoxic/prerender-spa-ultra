@@ -1,11 +1,10 @@
 import puppeteer, {
   Browser,
   Page,
-  Viewport,
   PuppeteerLaunchOptions,
+  ResourceType,
+  Viewport,
 } from 'puppeteer-core';
-
-import { ResourceType } from 'puppeteer-core/lib/cjs/puppeteer/common/HTTPRequest';
 
 import { getChromeExecutable } from './get-chrome-executable';
 import { isThirdParty } from './known-third-party';

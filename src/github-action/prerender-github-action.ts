@@ -13,7 +13,8 @@ import { preRenderSite } from '../prerenderer/prerender';
     const httpServerProcess = spawn(
       `cd ${websiteRoot} && python3 ${path.join(
         __dirname,
-        '../../src/prerenderer/http-server.py'
+        // path is such because this is executed from dist/prerender-github-action
+        '../../src/http-server.py'
       )}`,
       {
         shell: '/bin/bash',
@@ -29,7 +30,7 @@ import { preRenderSite } from '../prerenderer/prerender';
     const crawled = await preRenderSite({
       startingUrl: 'http://localhost:8000',
       maxConcurrentPages: Number(maxConcurrentPages),
-      outputDir: path.join(process.cwd(), websiteRoot, 'prerender'),
+      outputDir: path.join(process.cwd(), websiteRoot),
       extraBrowserLaunchOptions: {
         /**
          * github actions run as root and chrome won't start unless we disable sandboxing

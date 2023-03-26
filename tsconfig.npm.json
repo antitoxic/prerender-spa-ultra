@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist/prerenderer",
+    "outDir": "dist"
   },
   "include": ["src/prerenderer/**/*"]
 }
