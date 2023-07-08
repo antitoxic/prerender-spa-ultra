@@ -52,10 +52,6 @@ export interface PrerenderUltraOptions {
   outputDir: string;
   pageOptions?: PageOptions;
   generateSitemapUsingCanonicalBaseUrl?: string;
-  sitemapOptions?: {
-    outputDir: string;
-    canonicalBaseUrl: string;
-  };
   maxConcurrentPages?: number;
 
   // less used options
@@ -76,6 +72,7 @@ const DEFAULT_OPTIONS = {
       knownThirdParty: true,
     },
   },
+  cleanUrl: recreateUrl,
 } as const satisfies Partial<PrerenderUltraOptions>;
 
 /**
@@ -109,10 +106,10 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
 
   const { crawled } = await prerenderUrl({
     url: options.startingUrl,
+    cleanUrl: options.cleanUrl,
     getUrlInfo,
     getUrlFilePath: url =>
       getFilename(trimSlashes(url), options.outputDir, baseUrl),
-    ...(options.cleanUrl && { cleanUrl: options.cleanUrl }),
   });
 
   if (options.generateSitemapUsingCanonicalBaseUrl) {
@@ -137,7 +134,7 @@ export interface PrerenderUrlOptions {
   url: string;
   getUrlInfo: (url: string) => Promise<PageInfo | false>;
   getUrlFilePath: (url: string) => string;
-  cleanUrl?: (url: string) => string;
+  cleanUrl: (url: string) => string;
   stats?: { crawled: Set<string>; visited: Set<string> };
 }
 
@@ -146,7 +143,7 @@ const prerenderUrl = async ({
     crawled: new Set(),
     visited: new Set(),
   },
-  cleanUrl = recreateUrl,
+  cleanUrl,
   ...options
 }: PrerenderUrlOptions) => {
   log(`\nprerendering ... ${options.url}`);
@@ -174,9 +171,13 @@ const prerenderUrl = async ({
   log(`found ${pageInfo.links.length} links...`);
 
   stats.crawled.add(url);
+  const pageUrlsCleaned = pageInfo.links.map(linkUrl => cleanUrl(linkUrl));
   await Promise.all(
-    pageInfo.links
-      .filter(linkUrl => !stats.visited.has(cleanUrl(linkUrl)))
+    pageUrlsCleaned
+      .filter(
+        (linkUrl, i) =>
+          pageUrlsCleaned.indexOf(linkUrl) === i && !stats.visited.has(linkUrl)
+      )
       .map(linkUrl =>
         prerenderUrl({ ...options, url: linkUrl, cleanUrl, stats })
       )

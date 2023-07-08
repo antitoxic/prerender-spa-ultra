@@ -1,8 +1,3 @@
-## TODO:
-
-- tag v1
-- Publish npm package 0.9
-
 # `prerender-spa-ultra`
 
 Available as:
@@ -78,7 +73,30 @@ them.
 
 ### `github action` usage
 
-asdasd
+Example job definition for prerendering your repository via a github action:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+      - name: Install
+        run: |
+          npm install
+      - name: Build
+        run: |
+          npm run build
+      - name: Prereder the freshly built app
+        uses: @antitoxic/prerender-spa-ultra@1
+        id: prerender
+        with:
+          website_root: 'path/to/your/app/dist'
+          max_concurrent_pages: 10
+```
 
 <a name="prerender-spa-ultra-cli"></a>
 

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,minimum-scale=1"
+    />
+    <title>Example app used for testing</title>
+  </head>
+  <body>
+    <div id="app">
+      Test page
+      <a href="/random/html5pushlink">Link 1</a>
+      <a href="/other-non-existent-page">Link 2</a>
+    </div>
+    <script>
+      document.title = 'Dynamically changed title of the example app';
+      [...document.getElementsByTagName('a')].forEach(anchorEl => {
+        anchorEl.addEventListener('click', e => {
+          e.preventDefault();
+          history.pushState({}, '', e.target.getAttribute('href'));
+          return false;
+        });
+      });
+    </script>
+  </body>
+</html>
