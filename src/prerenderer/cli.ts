@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
+import * as path from 'node:path';
+
 import { CliParam, NonBooleanParam, setNestedKey } from '../ts-helpers';
 import { preRenderSite, PrerenderUltraOptions } from './prerender';
 
-const CLI_PARAM_DEFINITIONS: Array<CliParam> = [
+const CLI_PARAM_DEFINITIONS = [
   {
     isBoolean: true,
     cliParamName: '--block-css',
@@ -17,9 +19,24 @@ const CLI_PARAM_DEFINITIONS: Array<CliParam> = [
     exampleValue: 'https://your-app-domain-in-production.com/',
     helpText:
       'Enables sitemap generation and uses the provided url instead of original base',
-    cast: (value: string) => {
+    cast: (value, paramName) => {
       if (!value.startsWith('http')) {
-        console.error(`--canonical-base-url must start with 'http`);
+        console.error(`${paramName} must be an absolute url`);
+        process.exit(2);
+      }
+      return value;
+    },
+  },
+  {
+    isBoolean: false,
+    cliParamName: '--start-url',
+    correspondingProgrammaticOption: 'startingUrl',
+    exampleValue: 'http://localhost:8080/',
+    helpText:
+      'Enables sitemap generation and uses the provided url instead of original base',
+    cast: (value, paramName) => {
+      if (!value.startsWith('http')) {
+        console.error(`${paramName} must be an absolute url`);
         process.exit(2);
       }
       return value;
@@ -30,15 +47,8 @@ const CLI_PARAM_DEFINITIONS: Array<CliParam> = [
     cliParamName: '--meta-prerender-only',
     correspondingProgrammaticOption: 'metaPrerenderOnly',
     helpText:
-      'Mainly used if your only goal to prerender is capture the changes of html metadata for sharing links.' +
+      'Mainly used if your only goal to prerender is to capture the changes of html metadata for sharing links.' +
       'Saves .html file of every page but only the <head>...</head> portion changed from the original.',
-  },
-  {
-    isBoolean: true,
-    cliParamName: '--no-http-server',
-    correspondingProgrammaticOption: 'maxConcurrentPages',
-    helpText:
-      'Assumes the http server is already running and will not start it',
   },
   {
     isBoolean: false,
@@ -49,7 +59,7 @@ const CLI_PARAM_DEFINITIONS: Array<CliParam> = [
       'Controls how many urls should be prerendered in parallel.' +
       'Each prerender creates a chrome page which takes system resources.' +
       'Tune this for your system.',
-    cast: (value: string) => {
+    cast: value => {
       const valueAsNumber = Number(value);
       if (!isFinite(valueAsNumber)) {
         console.error(`--max-concurrent-pages must be a number`);
@@ -58,7 +68,13 @@ const CLI_PARAM_DEFINITIONS: Array<CliParam> = [
       return valueAsNumber;
     },
   },
-];
+  {
+    isBoolean: true,
+    cliParamName: '--no-http-server',
+    helpText:
+      'Disable the automatic start of a http static file server from the directory',
+  },
+] as const satisfies Readonly<Array<CliParam>>;
 
 const help = `
 	Usage
@@ -69,7 +85,9 @@ const help = `
       paramDefinition =>
         `${paramDefinition.cliParamName} ${[
           ...paramDefinition.helpText.split('\n'),
-          `(programatically via ${paramDefinition.correspondingProgrammaticOption})`,
+          'correspondingProgrammaticOption' in paramDefinition
+            ? `(programatically via ${paramDefinition.correspondingProgrammaticOption})`
+            : '(not available programatically)',
         ]
           .map(helpTextLine => helpTextLine.trim())
           .join('\n	    ')}`
@@ -93,6 +111,7 @@ if (!cliParams.length) {
 }
 
 let parsedParams: Partial<PrerenderUltraOptions> = {};
+let shouldStartHttpServer: boolean = true;
 const KNOWN_CLI_PARAM_NAMES = CLI_PARAM_DEFINITIONS.map(
   paramDefinition => paramDefinition.cliParamName
 );
@@ -107,19 +126,26 @@ CLI_PARAM_DEFINITIONS.forEach(paramDefinition => {
   const nextCliParam = cliParams[cliParamIndex + 1];
   if (
     !paramDefinition.isBoolean &&
-    (!nextCliParam || KNOWN_CLI_PARAM_NAMES.includes(nextCliParam))
+    (!nextCliParam ||
+      (KNOWN_CLI_PARAM_NAMES as string[]).includes(nextCliParam))
   ) {
     console.error(`${paramDefinition.cliParamName} requires a value`);
     process.exit(2);
   }
 
-  parsedParams = setNestedKey(
-    parsedParams,
-    paramDefinition.correspondingProgrammaticOption,
-    paramDefinition.isBoolean
-      ? cliParams.includes(paramDefinition.cliParamName)
-      : paramDefinition.cast(String(nextCliParam))
-  );
+  const value = paramDefinition.isBoolean
+    ? cliParams.includes(paramDefinition.cliParamName)
+    : paramDefinition.cast(String(nextCliParam), paramDefinition.cliParamName);
+
+  if ('correspondingProgrammaticOption' in paramDefinition) {
+    parsedParams = setNestedKey(
+      parsedParams,
+      paramDefinition.correspondingProgrammaticOption,
+      value
+    );
+  } else if (paramDefinition.cliParamName === '--no-http-server') {
+    shouldStartHttpServer = !value;
+  }
 
   cliParams.splice(cliParamIndex, paramDefinition.isBoolean ? 1 : 2);
 });
@@ -135,8 +161,20 @@ if (cliParams.length !== 1) {
   process.exit(2);
 }
 
-void preRenderSite({
-  startingUrl: 'http://localhost:8000',
-  outputDir: cliParams[0]!,
+const finalOptions = {
+  startingUrl: 'http://localhost:8080',
+  outputDir: path.resolve(process.cwd(), cliParams[0]!),
   ...parsedParams,
-});
+};
+
+void (async () => {
+  if (shouldStartHttpServer) {
+    const { createStaticFileServer } = await import('./http-server');
+    const server = createStaticFileServer(finalOptions.outputDir);
+    process.on('exit', () => {
+      server.close();
+    });
+  }
+
+  await preRenderSite(finalOptions);
+})();

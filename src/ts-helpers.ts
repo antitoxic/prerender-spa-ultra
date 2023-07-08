@@ -15,14 +15,14 @@ type NestedKeyOf<T extends object> = {
 export interface BooleanParam {
   isBoolean: true;
   cliParamName: string;
-  correspondingProgrammaticOption: NestedKeyOf<PrerenderUltraOptions>;
+  correspondingProgrammaticOption?: NestedKeyOf<PrerenderUltraOptions>;
   helpText: string;
 }
 
 export interface NonBooleanParam extends Omit<BooleanParam, 'isBoolean'> {
   isBoolean: false;
   exampleValue: string | number;
-  cast: (value: string) => unknown;
+  cast: (value: string, paramName: string) => unknown;
 }
 export type CliParam = BooleanParam | NonBooleanParam;
 
