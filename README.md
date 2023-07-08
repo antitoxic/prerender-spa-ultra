@@ -1,4 +1,7 @@
-# `prerender-spa-ultra`
+![prerender-spa-ultra: Generate static site from any application, whatever the tech stack. Get the benefits of Jamstack without binding yourself to specific framework or
+static generator generator](./docs/header.png)
+
+[![Open `prerender-spa-ultra` in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/antitoxic/prerender-spa-utlra)
 
 Available as:
 
@@ -15,7 +18,7 @@ them.
 [Usage](#prerender-spa-ultra-usage) — [Goals](#prerender-spa-ultra-goals) —
 [Limitations & Caveats](#prerender-spa-ultra-limitations)
 
-### When is this useful? (_purpose_)
+### What is this for? (_purpose_)
 
 1. When your app uses `/deep/link/to/a/page` and you want to get a nice preview
    of that page when its `URL` is shared.
@@ -104,19 +107,21 @@ jobs:
 
 Check the help output of `npx prerender-spa-ultra` or the self-explanatory
 source code of the cli:
-https://github.com/antitoxic/prerender-spa-ultra/blob/3a1e5de679df5d79ca66861c5916a6b1be93fc2a/src/prerenderer/cli.ts#L7-L60
+https://github.com/antitoxic/prerender-spa-ultra/blob/a6da7f84504362c34651f23be30cc43a8bb2d3d5/src/prerenderer/cli.ts#L9-L76
 
 <a name="prerender-spa-ultra-npm-package"></a>
 
 ### `npm` package usage
 
 `preRenderSite(...)` config type definitions:
-https://github.com/antitoxic/prerender-spa-ultra/blob/3a1e5de679df5d79ca66861c5916a6b1be93fc2a/src/prerenderer/prerender.ts#L48-L65
+https://github.com/antitoxic/prerender-spa-ultra/blob/9792acbd6125124292158192036ca064de5c4be8/src/prerenderer/prerender.ts#L49-L62
 
 If you are not using the peer dependency `node-static` to
 [run http server for your static files](#http-server-with-fallback) you can skip
 
 ## Debugging problems
+
+You can enable logging:
 
 ```shell
 PRERENDER_SPA_ULTRA_DEBUG=1 npx prerender-spa-ultra ....
