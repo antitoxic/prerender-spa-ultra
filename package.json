@@ -1,12 +1,17 @@
 {
   "name": "prerender-spa-ultra",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Crawls & Pre-renders a site",
   "main": "dist/prerenderer/prerender.js",
   "exports": {
-    ".": "./dist/prerenderer/*"
+    ".": "./dist/prerenderer/index.js",
+    "./*": "./dist/prerenderer/*.js"
   },
+  "files": [
+    "dist/*",
+    "src/*"
+  ],
   "engines": {
     "node": ">=16.x <19"
   },
