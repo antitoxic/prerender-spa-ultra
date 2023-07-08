@@ -1,13 +1,9 @@
 ![prerender-spa-ultra: Generate static site from any application, whatever the tech stack. Get the benefits of Jamstack without binding yourself to specific framework or
 static generator generator](./docs/header.png)
 
-[![Open `prerender-spa-ultra` in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/antitoxic/prerender-spa-utlra)
 
-Available as:
 
-- github `action`
-- `cli` command
-- `npm` package
+<div align="center">
 
 Converts your `JavaScript`-powered
 [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA 'Single Page Application')
@@ -15,8 +11,19 @@ web application into individual `*.html` documents (_one for each unique `URL`
 your app has_) filled with the content that your `JavaScript` generated for
 them.
 
+
 [Usage](#prerender-spa-ultra-usage) — [Goals](#prerender-spa-ultra-goals) —
 [Limitations & Caveats](#prerender-spa-ultra-limitations)
+
+
+
+(available as _github `action`, `cli` command & `npm` package_)
+
+[![Open `prerender-spa-ultra` in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/antitoxic/prerender-spa-utlra)
+
+</div>
+
+---
 
 ### What is this for? (_purpose_)
 
