@@ -1,6 +1,6 @@
 {
   // This is for editor integration & base config for all packages
-  "extends": "@tsconfig/node16-strictest",
+  "extends": ["@tsconfig/strictest", "@tsconfig/node16"],
   "compilerOptions": {
     "lib": ["es2021", "dom"],
     "declaration": true,

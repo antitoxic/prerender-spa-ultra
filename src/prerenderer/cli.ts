@@ -169,7 +169,7 @@ const finalOptions = {
 
 void (async () => {
   if (shouldStartHttpServer) {
-    const { createStaticFileServer } = await import('./http-server');
+    const { createStaticFileServer } = await import('./http-server.js');
     const server = createStaticFileServer(finalOptions.outputDir);
     process.on('exit', () => {
       server.close();
