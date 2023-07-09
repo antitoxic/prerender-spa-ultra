@@ -27,7 +27,8 @@
     "build:npm": "tsc --project ./tsconfig.npm.json",
     "build:github-aciton": "esbuild src/github-action/prerender-github-action.ts --outfile=dist/prerender-github-action/index.js --bundle --minify --platform=node --target=node16",
     "dev:github-aciton": "npm run build:github-aciton --watch",
-    "dev:npm": "npm run build:npm --watch"
+    "dev:npm": "npm run build:npm --watch",
+    "test": "vitest"
   },
   "prettier": {
     "singleQuote": true,
@@ -42,7 +43,8 @@
     "@tsconfig/strictest": "^2.0.1",
     "@types/serve-handler": "^6.1.1",
     "esbuild": "^0.18.11",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^0.33.0"
   },
   "peerDependencies": {
     "serve-handler": "^6.1.5"

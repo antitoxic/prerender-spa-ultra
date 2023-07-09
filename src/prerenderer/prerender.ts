@@ -23,7 +23,7 @@ interface PageInfo {
   links: string[];
 }
 
-const getPageInfo = async (
+export const getPageInfo = async (
   page: Page,
   url: string
 ): Promise<PageInfo | false> => {
