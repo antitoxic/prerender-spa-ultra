@@ -45,7 +45,7 @@ them.
 1. As a `github action`
    ([_» see all GitHub action settings_](#prerender-spa-ultra-github-action)):
    ```yaml
-   uses: antitoxic/prerender-spa-ultra@v1
+   uses: antitoxic/prerender-spa-ultra@v1.0.1
    with:
      website_root: 'path/to/your/spa/dist'
    ```
@@ -101,7 +101,7 @@ jobs:
         run: |
           npm run build
       - name: Prereder the freshly built app
-        uses: @antitoxic/prerender-spa-ultra@1
+        uses: @antitoxic/prerender-spa-ultra@v1.0.1
         id: prerender
         with:
           website_root: 'path/to/your/app/dist'
