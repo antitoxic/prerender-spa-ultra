@@ -28,8 +28,8 @@ them.
    Link sharing over most channels like messaging apps, social networks or other
    websites will not run `JavaScript`, so they will preview your `URL` based on
    your static `*.html` (_which is likely empty_). So if you want to preview
-   meaningful things that are shown with `JavaScript` like the the page main
-   image, or the correct page title you want to `prerender`.
+   meaningful things that are shown with `JavaScript` like the page main image,
+   or the correct page title you want to `prerender`.
 
 2. When you expect slow connection to your
    [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA 'Single Page Application')
@@ -43,7 +43,7 @@ them.
 ## Usage
 
 1. As a `github action`
-   ([_» see all github action settings_](#prerender-spa-ultra-github-action)):
+   ([_» see all GitHub action settings_](#prerender-spa-ultra-github-action)):
    ```yaml
    uses: antitoxic/prerender-spa-ultra@v1
    with:
@@ -78,7 +78,12 @@ them.
 
 ### `github action` usage
 
-Example job definition for prerendering your repository via a github action:
+Below you can find an example of a job definition for prerendering your
+repository via a GitHub workflow. Keep in mind that you can skip/remove
+`actions/setup-node@v3`, if you don't utilize `npm` caching.
+
+Whenever a GitHub workflow runs, `nodejs` is already available and is the exact
+version needed, since `prerender-spa-ultra` is written considering this.
 
 ```yaml
 jobs:
@@ -101,6 +106,18 @@ jobs:
         with:
           website_root: 'path/to/your/app/dist'
           max_concurrent_pages: 10
+```
+
+If you are looking to deploy the final prerendered files to Cloudflare you can
+add the following action in the end of your job:
+
+```yaml
+- name: Deploy to cloudflare
+  env:
+    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  run:
+    npx wrangler pages publish path/to/your/app/dist --project-name
+    REPLACE_WITH_YOUR_PROJECT_NAME
 ```
 
 <a name="prerender-spa-ultra-cli"></a>
@@ -135,8 +152,8 @@ PRERENDER_SPA_ULTRA_DEBUG=1 <your command that uses this package programatically
 
 ## Serving your [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA 'Single Page Application') static files with local http server
 
-The `prerender-spa-ultra`'s cli & github action internally use the
-`serve-handler` npm package to start an http server but there are multiple
+The `prerender-spa-ultra`'s cli & GitHub action internally use the
+`serve-handler` npm package to start a http server but there are multiple
 alternatives:
 
 ```shell
@@ -181,9 +198,10 @@ python <path/to/node_modules>/prerender-spa-ultra/src/http-server.py
 ## Goals of `prerender-spa-ultra`
 
 - **Simplest prerender out there**
-  - Single programmatic dependency (`puppeteer-core`), nothing else. This also
-    means saving build-time otherwise spend downloading packages & binaries on
-    every build
+  - Single programmatic dependency (`puppeteer-core`), nothing else besides the
+    peer dependency for the automatic http server in CLI (which _you can opt
+    out_). This also means saving build-time otherwise spend downloading
+    packages & binaries on every build
   - Pre-renderer with the lowest bug surface (including dependencies) - written
     in the most concise way possible while keeping readability-first design
   - Know what you are executing — One of the goals for `prerender-spa-ultra` is
@@ -226,12 +244,13 @@ python <path/to/node_modules>/prerender-spa-ultra/src/http-server.py
   `prerender-spa-ultra` as a nodejs module and call it with all the options you
   need.
 - `prerender-spa-ultra` is not going to **install chrome or chromium**. If you
-  are using github workflows or similar, it's likely to have it already
+  are using GitHub workflows or similar, it's likely to have it already
   installed. Otherwise, you can use the OS package manager to install or use
   `node-chromium` (`npm install chromium`)
 
 ## Funding
-Will be opened very soon, waiting for Github sponsorship approval :) 
+
+Will be opened very soon, waiting for GitHub sponsorship approval :)
 
 ## Prior art
 
@@ -254,8 +273,8 @@ Will be opened very soon, waiting for Github sponsorship approval :)
 
 # Background & References
 
-- Not ideal to use JSDOM since it can't safely execute `<script/>`s
-- Good jam-stack intro video: https://vimeo.com/163522126 and the rest:
+- Not ideal to use `JSDOM` since it can't safely execute `<script/>`s
+- Good Jamstack intro video: https://vimeo.com/163522126 and the rest:
   https://jamstack.org/resources/videos/
 - Available binary packages in various CI/CD pre-build images:
   - https://github.com/cloudflare/pages-build-image/discussions/1 &
@@ -263,7 +282,7 @@ Will be opened very soon, waiting for Github sponsorship approval :)
   - https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md
   - https://github.com/netlify/build-image/blob/focal/included_software.md
 - Reserved tlds for local work https://news.ycombinator.com/item?id=12578908
-- Github actions running locally:
+- GitHub actions running locally:
   - https://stackoverflow.com/questions/59241249/how-to-run-prerender-spa-ultra-github-actions-workflows-locally
   - https://github.com/nektos/act
 
@@ -271,10 +290,10 @@ Will be opened very soon, waiting for Github sponsorship approval :)
 
 https://developers.cloudflare.com/workers/wrangler/ci-cd/
 
-To use cloudflare cli (`wrangler`) from CI like github actions you need to
+To use cloudflare cli (`wrangler`) from CI like GitHub actions you need to
 create `CLOUDFLARE_API_TOKEN` and add it as a secret in that CI environment
 
 Maybe you will need to set `CLOUDFLARE_ACCOUNT_ID` if you have more than 1
-accounts associated with this API token.
+account associated with this API token.
 
-Must expose github secret as ENV variable (not done by default)
+Must expose GitHub secret as ENV variable (not done by default)
