@@ -1,7 +1,5 @@
 ![prerender-spa-ultra: Generate static site from any application, whatever the tech stack. Get the benefits of Jamstack without binding yourself to specific framework or
-static generator generator](./docs/header.png)
-
-
+static generator](./docs/header.png)
 
 <div align="center">
 
@@ -11,11 +9,8 @@ web application into individual `*.html` documents (_one for each unique `URL`
 your app has_) filled with the content that your `JavaScript` generated for
 them.
 
-
 [Usage](#prerender-spa-ultra-usage) — [Goals](#prerender-spa-ultra-goals) —
 [Limitations & Caveats](#prerender-spa-ultra-limitations)
-
-
 
 (available as _github `action`, `cli` command & `npm` package_)
 
@@ -123,7 +118,7 @@ https://github.com/antitoxic/prerender-spa-ultra/blob/a6da7f84504362c34651f23be3
 `preRenderSite(...)` config type definitions:
 https://github.com/antitoxic/prerender-spa-ultra/blob/9792acbd6125124292158192036ca064de5c4be8/src/prerenderer/prerender.ts#L49-L62
 
-If you are not using the peer dependency `node-static` to
+If you are not using the peer dependency `serve-handler` to
 [run http server for your static files](#http-server-with-fallback) you can skip
 
 ## Debugging problems
@@ -234,6 +229,9 @@ python <path/to/node_modules>/prerender-spa-ultra/src/http-server.py
   are using github workflows or similar, it's likely to have it already
   installed. Otherwise, you can use the OS package manager to install or use
   `node-chromium` (`npm install chromium`)
+
+## Funding
+Will be opened very soon, waiting for Github sponsorship approval :) 
 
 ## Prior art
 
