@@ -1,8 +1,14 @@
 {
   "name": "prerender-spa-ultra",
+  "description": "Crawls & Pre-renders a site",
   "license": "MIT",
   "version": "1.0.1",
-  "description": "Crawls & Pre-renders a site",
+  "author": "Anton Stoychev",
+  "repository": "github:antitoxic/prerender-spa-ultra",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/antitoxic"
+  },
   "main": "dist/prerenderer/prerender.js",
   "exports": {
     ".": "./dist/prerenderer/index.js",
