@@ -35,6 +35,16 @@ export const getPageInfo = async (
   if (!isHtml) {
     return false;
   } else {
+    log(
+      selectorToWaitFor
+        ? `Waiting for selector: ${selectorToWaitFor}`
+        : 'Waiting for network idle'
+    );
+    log(
+      metaPrerenderOnly
+        ? 'Fetching only rendered <head>..'
+        : 'Fetching entire rendered page...'
+    );
     await (selectorToWaitFor
       ? page.waitForSelector(selectorToWaitFor)
       : waitNetworkIdle);
