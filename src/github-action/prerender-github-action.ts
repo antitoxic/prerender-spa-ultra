@@ -11,10 +11,14 @@ void (async () => {
   try {
     const websiteRoot = core.getInput('website_root');
     const maxConcurrentPages = core.getInput('max_concurrent_pages');
+    const metaPrerenderOnly = core.getInput('meta_prerender_only');
+    const selectorToWaitFor = core.getInput('selector_to_wait_for');
 
     httpServer = createStaticFileServer(websiteRoot);
 
     const crawled = await preRenderSite({
+      ...(selectorToWaitFor && { selectorToWaitFor }),
+      metaPrerenderOnly: metaPrerenderOnly === '1',
       startingUrl: 'http://localhost:8080',
       maxConcurrentPages: Number(maxConcurrentPages),
       outputDir: path.join(process.cwd(), websiteRoot),

@@ -1,13 +1,24 @@
 name: 'Prerender website'
-description: 'Converts/pre-renders single page application (SPA) into static html files'
+description:
+  'Converts/pre-renders single page application (SPA) into static html files'
 author: 'Anton Stoychev'
 inputs:
   website_root:
     required: true
-    description: 'Directory where your /index.html is and where you will get the pre-rendered output'
+    description:
+      'Directory where your /index.html is and where you will get the
+      pre-rendered output'
   max_concurrent_pages:
     description: 'Maximum number of parallel page rendering'
     default: '3'
+  meta_prerender_only:
+    description:
+      'Resulting *.html files have only the <head>...</head> changed. Set this
+      to "1" to enable.'
+  selector_to_wait_for:
+    description:
+      'When provided the html will be captured only after the provided DOM
+      element selector exists.'
 runs:
   using: 'node16'
   main: 'dist/prerender-github-action/index.js'

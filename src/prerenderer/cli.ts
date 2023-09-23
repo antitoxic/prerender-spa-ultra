@@ -51,6 +51,13 @@ const CLI_PARAM_DEFINITIONS = [
       'Saves .html file of every page but only the <head>...</head> portion changed from the original.',
   },
   {
+    isBoolean: true,
+    cliParamName: '--selector-to-wait-for',
+    correspondingProgrammaticOption: 'selectorToWaitFor',
+    helpText:
+      'When provided the html will be captured only after the provided DOM element selector exists.',
+  },
+  {
     isBoolean: false,
     cliParamName: '--max-concurrent-pages',
     correspondingProgrammaticOption: 'maxConcurrentPages',

@@ -19,28 +19,39 @@ const getMinimumSharableHtml = (originalSource: string, renderedHead: string) =>
 
 interface PageInfo {
   htmlSource: string;
-  renderedHtmlHead: string;
+  renderedHtml?: string;
+  renderedHtmlHead?: string;
   links: string[];
 }
 
 export const getPageInfo = async (
   page: Page,
-  url: string
+  url: string,
+  selectorToWaitFor?: string,
+  metaPrerenderOnly?: boolean
 ): Promise<PageInfo | false> => {
   const { res, waitNetworkIdle } = await goTo(page, url);
   const isHtml = res!.headers()['content-type']?.includes('text/html');
   if (!isHtml) {
     return false;
   } else {
-    await waitNetworkIdle;
-    const [htmlSource, renderedHtmlHead, links] = await Promise.all([
+    await (selectorToWaitFor
+      ? page.waitForSelector(selectorToWaitFor)
+      : waitNetworkIdle);
+    const [htmlSource, renderedContent, links] = await Promise.all([
       res!.text(),
-      page.evaluate(() => new XMLSerializer().serializeToString(document.head)),
+      metaPrerenderOnly
+        ? page.evaluate(() =>
+            new XMLSerializer().serializeToString(document.head)
+          )
+        : page.content(),
       getLinks(page),
     ]);
     return {
       htmlSource,
-      renderedHtmlHead,
+      ...(metaPrerenderOnly
+        ? { renderedHtmlHead: renderedContent }
+        : { renderedHtml: renderedContent }),
       links,
     };
   }
@@ -53,6 +64,7 @@ export interface PrerenderUltraOptions {
   pageOptions?: PageOptions;
   generateSitemapUsingCanonicalBaseUrl?: string;
   maxConcurrentPages?: number;
+  selectorToWaitFor?: string;
 
   // less used options
   getFilename?: (url: string) => string;
@@ -94,12 +106,20 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
   };
   const baseUrl = options.baseUrl || options.startingUrl;
   const browser = await getBrowser(options.extraBrowserLaunchOptions);
+  const initNewPage = () => getPage(browser, options.pageOptions);
+  const createUrlScraperWithPage = (page: Page) => (url: string) =>
+    getPageInfo(
+      page,
+      url,
+      options.selectorToWaitFor,
+      Boolean(options.metaPrerenderOnly)
+    );
 
   const getUrlInfo = addRateLimit(
     connectWithPooledObject(
-      () => getPage(browser, options.pageOptions),
+      initNewPage,
       options.maxConcurrentPages,
-      page => (url: string) => getPageInfo(page, url)
+      createUrlScraperWithPage
     ),
     options.maxConcurrentPages
   );
@@ -107,6 +127,7 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
   const { crawled } = await prerenderUrl({
     url: options.startingUrl,
     cleanUrl: options.cleanUrl,
+    metaPrerenderOnly: Boolean(options.metaPrerenderOnly),
     getUrlInfo,
     getUrlFilePath: url =>
       getFilename(trimSlashes(url), options.outputDir, baseUrl),
@@ -132,6 +153,7 @@ export const preRenderSite = async (userOptions: PrerenderUltraOptions) => {
 
 export interface PrerenderUrlOptions {
   url: string;
+  metaPrerenderOnly?: boolean;
   getUrlInfo: (url: string) => Promise<PageInfo | false>;
   getUrlFilePath: (url: string) => string;
   cleanUrl: (url: string) => string;
@@ -166,7 +188,9 @@ const prerenderUrl = async ({
 
   await writeFile(
     options.getUrlFilePath(url),
-    getMinimumSharableHtml(pageInfo.htmlSource, pageInfo.renderedHtmlHead)
+    options.metaPrerenderOnly
+      ? getMinimumSharableHtml(pageInfo.htmlSource, pageInfo.renderedHtmlHead!)
+      : pageInfo.renderedHtml!
   );
   log(`found ${pageInfo.links.length} links...`);
 

@@ -105,7 +105,10 @@ jobs:
         id: prerender
         with:
           website_root: 'path/to/your/app/dist'
+          # the options below are optional:
           max_concurrent_pages: 10
+          meta_prerender_only: "1"
+          selector_to_wait_for: "[data-scraper=ready]"
 ```
 
 If you are looking to deploy the final prerendered files to Cloudflare you can
@@ -126,14 +129,14 @@ add the following action in the end of your job:
 
 Check the help output of `npx prerender-spa-ultra` or the self-explanatory
 source code of the cli:
-https://github.com/antitoxic/prerender-spa-ultra/blob/a6da7f84504362c34651f23be30cc43a8bb2d3d5/src/prerenderer/cli.ts#L9-L76
+https://github.com/antitoxic/prerender-spa-ultra/blob/main/src/prerenderer/cli.ts#L9-L83
 
 <a name="prerender-spa-ultra-npm-package"></a>
 
 ### `npm` package usage
 
 `preRenderSite(...)` config type definitions:
-https://github.com/antitoxic/prerender-spa-ultra/blob/9792acbd6125124292158192036ca064de5c4be8/src/prerenderer/prerender.ts#L49-L62
+https://github.com/antitoxic/prerender-spa-ultra/blob/main/src/prerenderer/prerender.ts#L59-L71
 
 If you are not using the peer dependency `serve-handler` to
 [run http server for your static files](#http-server-with-fallback) you can skip
