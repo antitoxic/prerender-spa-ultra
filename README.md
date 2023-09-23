@@ -151,6 +151,17 @@ PRERENDER_SPA_ULTRA_DEBUG=1 npx prerender-spa-ultra ....
 PRERENDER_SPA_ULTRA_DEBUG=1 <your command that uses this package programatically>
 ```
 
+or as GitHub job step:
+
+```yaml
+- name: Pre-render
+  uses: antitoxic/prerender-spa-ultra@v1.1.0
+  env:
+    PRERENDER_SPA_ULTRA_DEBUG: 1
+  with:
+    website_root: dist
+```
+
 <a name="http-server-with-fallback"></a>
 
 ## Serving your [SPA](https://developer.mozilla.org/en-US/docs/Glossary/SPA 'Single Page Application') static files with local http server
