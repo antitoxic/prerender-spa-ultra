@@ -42,11 +42,39 @@ export const BlockableType = {
   SCRIPT: 'script',
 } as const satisfies Record<string, ResourceType>;
 
+/**
+ * Crawling multiple pages in parallel means multiple tabs in Chrome
+ * However only a single tab can be focused at a time.
+ *
+ * For any non-focused tab, any logic relying on `document.hidden`
+ * and `window.requestAnimationFrame` will never get executed. That's why
+ * we need to monkey-patch/fake that each page is visible.
+ *
+ * ref: https://stackoverflow.com/a/59472715
+ */
+export const polyfillAlwaysFocusedTab = () => {
+  Object.defineProperty(window.document, 'hidden', {
+    get: function () {
+      return false;
+    },
+    configurable: true,
+  });
+  Object.defineProperty(window.document, 'visibilityState', {
+    get: function () {
+      return 'visible';
+    },
+    configurable: true,
+  });
+  window.requestAnimationFrame = callback => setTimeout(callback, 10);
+  window.cancelAnimationFrame = id => clearTimeout(id);
+};
+
 export const getPage = async (browser: Browser, options?: PageOptions) => {
   const page = await browser.newPage();
   if (options?.viewport) {
     await page.setViewport(options.viewport);
   }
+  await page.evaluateOnNewDocument(polyfillAlwaysFocusedTab);
   if (options?.block) {
     await page.setRequestInterception(true);
     const { block } = options;
