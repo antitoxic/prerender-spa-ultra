@@ -24,17 +24,29 @@
   "bin": {
     "prerender-spa-ultra": "./dist/prerenderer/cli.js"
   },
-  "dependencies": {
-    "puppeteer-core": "19.11.1"
-  },
   "scripts": {
     "prepack": "npm run build",
     "build": "npm run build:npm && npm run build:github-aciton",
     "build:npm": "tsc --project ./tsconfig.npm.json",
-    "build:github-aciton": "esbuild src/github-action/prerender-github-action.ts --outfile=dist/prerender-github-action/index.js --bundle --minify --platform=node --target=node16",
+    "build:github-aciton": "esbuild --alias:yargs=./src/github-action/mocks/yargs --alias:cross-fetch=./src/github-action/mocks/cross-fetch --alias:proxy-agent=./src/github-action/mocks/proxy-agent src/github-action/prerender-github-action.ts --outfile=dist/prerender-github-action/index.js --bundle --minify --platform=node --target=node16",
     "dev:github-aciton": "npm run build:github-aciton --watch",
     "dev:npm": "npm run build:npm --watch",
     "test": "vitest"
+  },
+  "dependencies": {
+    "puppeteer-core": "^21.3.4"
+  },
+  "devDependencies": {
+    "@actions/core": "^1.10.0",
+    "@tsconfig/node16": "^16.1.0",
+    "@tsconfig/strictest": "^2.0.1",
+    "@types/serve-handler": "^6.1.1",
+    "esbuild": "^0.19.3",
+    "typescript": "^5.1.6",
+    "vitest": "^0.33.0"
+  },
+  "peerDependencies": {
+    "serve-handler": "^6.1.5"
   },
   "prettier": {
     "singleQuote": true,
@@ -42,17 +54,5 @@
     "arrowParens": "avoid",
     "trailingComma": "es5",
     "jsxBracketSameLine": true
-  },
-  "devDependencies": {
-    "@actions/core": "^1.10.0",
-    "@tsconfig/node16": "^16.1.0",
-    "@tsconfig/strictest": "^2.0.1",
-    "@types/serve-handler": "^6.1.1",
-    "esbuild": "^0.18.11",
-    "typescript": "^5.1.6",
-    "vitest": "^0.33.0"
-  },
-  "peerDependencies": {
-    "serve-handler": "^6.1.5"
   }
 }
