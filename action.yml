@@ -19,6 +19,14 @@ inputs:
     description:
       'When provided the html will be captured only after the provided DOM
       element selector exists.'
+  blocked_partial_urls:
+    description:
+      'Multi-line input. Each line is treated as partial of a URL which you want
+      to block when pre-rendering'
+  canonical_base_url:
+    description:
+      'Enables sitemap generation and uses the provided url instead of original
+      base'
 runs:
   using: 'node16'
   main: 'dist/prerender-github-action/index.js'
