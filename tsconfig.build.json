@@ -1,0 +1,10 @@
+{
+  // This is for editor integration & base config for all packages
+  "extends": ["@tsconfig/strictest", "@tsconfig/node16"],
+  "compilerOptions": {
+    "lib": ["es2021", "dom"],
+    "skipLibCheck": true,
+    "importsNotUsedAsValues": "remove"
+  },
+  "include": ["src/**/*"]
+}

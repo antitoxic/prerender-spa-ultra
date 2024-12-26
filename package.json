@@ -2,7 +2,7 @@
   "name": "prerender-spa-ultra",
   "description": "Crawls & Pre-renders a site",
   "license": "MIT",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "author": "Anton Stoychev",
   "repository": "github:antitoxic/prerender-spa-ultra",
   "funding": {
@@ -14,12 +14,15 @@
     ".": "./dist/prerenderer/index.js",
     "./*": "./dist/prerenderer/*.js"
   },
+  "imports": {
+    "#src/*": "./src/prerenderer/*.ts"
+  },
   "files": [
     "dist/*",
     "src/*"
   ],
   "engines": {
-    "node": ">=16.x <19"
+    "node": ">=16.x"
   },
   "bin": {
     "prerender-spa-ultra": "./dist/prerenderer/cli.js"
@@ -28,25 +31,43 @@
     "prepack": "npm run build",
     "build": "npm run build:npm && npm run build:github-aciton",
     "build:npm": "tsc --project ./tsconfig.npm.json",
-    "build:github-aciton": "esbuild --alias:yargs=./src/github-action/mocks/yargs --alias:cross-fetch=./src/github-action/mocks/cross-fetch --alias:proxy-agent=./src/github-action/mocks/proxy-agent src/github-action/prerender-github-action.ts --outfile=dist/prerender-github-action/index.js --bundle --minify --platform=node --target=node16",
+    "build:github-aciton": "pnpm run transpile",
+    "analyze:build:github-aciton": "ANALYZE_BUILD=1 pnpm build:github-aciton",
     "dev:github-aciton": "npm run build:github-aciton --watch",
     "dev:npm": "npm run build:npm --watch",
-    "test": "vitest"
+    "test": "vitest",
+    "transpile": "CONFIG_PLUGIN=$PWD/node_modules/@rollup/plugin-swc/dist/es/index.js && rollup --configPlugin $CONFIG_PLUGIN --config ./rollup.config.ts",
+    "dev": "pnpm --filter='{.}^...' build && pnpm run dev:watch",
+    "dev:with-deps": "pnpm --filter='{.}^...' build && pnpm --filter='{.}...' run --parallel '/^dev:(watch|serve)$/'",
+    "dev:watch": "pnpm run transpile --watch",
+    "try:github-action:requires-env:INPUT_WEBSITE_ROOT": "PRERENDER_SPA_ULTRA_DEBUG=1 INPUT_MAX_CONCURRENT_PAGES=1 INPUT_META_PRERENDER_ONLY=1 INPUT_WEBSITE_ROOT=$INPUT_WEBSITE_ROOT node ./dist/prerender-github-action/index.js"
   },
   "dependencies": {
-    "puppeteer-core": "^21.3.4"
+    "puppeteer-core": "^23.11.1"
   },
   "devDependencies": {
     "@actions/core": "^1.10.0",
+    "@rollup/plugin-alias": "^5.1.1",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-swc": "^0.4.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@tsconfig/node16": "^16.1.0",
     "@tsconfig/strictest": "^2.0.1",
     "@types/serve-handler": "^6.1.1",
-    "esbuild": "^0.19.3",
+    "prettier": "^3.4.2",
+    "rollup": "^4.29.1",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "serve-handler": "^6.1.5",
+    "tslib": "^2.8.1",
     "typescript": "^5.1.6",
     "vitest": "^0.33.0"
   },
   "peerDependencies": {
-    "serve-handler": "^6.1.5"
+    "serve-handler": "^6.1.5",
+    "tslib": "^2.8.1"
   },
   "prettier": {
     "singleQuote": true,

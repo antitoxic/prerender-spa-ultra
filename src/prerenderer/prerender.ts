@@ -14,13 +14,16 @@ const recreateUrl = (url: string) => {
   return trimSlashes(`${urlObj.origin}${urlObj.pathname}`);
 };
 
-const getMinimumSharableHtml = (originalSource: string, renderedHead: string) =>
-  originalSource.replace(/<head[\s\S]*>[\s\S]*<\/head>/, renderedHead);
+const getMinimumSharableHtml = (originalSource: string, renderedMeta: string) =>
+  originalSource
+    .replaceAll(/<title[^>]*>.+<\/title[^>]*>/gi, '')
+    .replaceAll(/<meta[^>]*>/gi, '')
+    .replace(/(<head[^>]*>)/gi, `$1${renderedMeta}`);
 
 interface PageInfo {
   htmlSource: string;
   renderedHtml?: string;
-  renderedHtmlHead?: string;
+  renderedHtmlMeta?: string;
   links: string[];
 }
 
@@ -42,7 +45,7 @@ export const getPageInfo = async (
     );
     log(
       metaPrerenderOnly
-        ? 'Fetching only rendered <head>..'
+        ? 'Fetching only <title> and <meta> inside <head>..'
         : 'Fetching entire rendered page...'
     );
     await (selectorToWaitFor
@@ -51,16 +54,22 @@ export const getPageInfo = async (
     const [htmlSource, renderedContent, links] = await Promise.all([
       res!.text(),
       metaPrerenderOnly
-        ? page.evaluate(() =>
-            new XMLSerializer().serializeToString(document.head)
-          )
+        ? page.evaluate(() => {
+            const serializer = new XMLSerializer();
+            return [
+              ...document.head.getElementsByTagName('META'),
+              ...document.head.getElementsByTagName('TITLE'),
+            ]
+              .map(node => serializer.serializeToString(node))
+              .join('');
+          })
         : page.content(),
       getLinks(page),
     ]);
     return {
       htmlSource,
       ...(metaPrerenderOnly
-        ? { renderedHtmlHead: renderedContent }
+        ? { renderedHtmlMeta: renderedContent }
         : { renderedHtml: renderedContent }),
       links,
     };
@@ -199,7 +208,7 @@ const prerenderUrl = async ({
   await writeFile(
     options.getUrlFilePath(url),
     options.metaPrerenderOnly
-      ? getMinimumSharableHtml(pageInfo.htmlSource, pageInfo.renderedHtmlHead!)
+      ? getMinimumSharableHtml(pageInfo.htmlSource, pageInfo.renderedHtmlMeta!)
       : pageInfo.renderedHtml!
   );
   log(`found ${pageInfo.links.length} links...`);

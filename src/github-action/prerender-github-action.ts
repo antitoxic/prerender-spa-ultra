@@ -3,8 +3,8 @@ import * as path from 'node:path';
 
 import * as core from '@actions/core';
 
-import { createStaticFileServer } from '../prerenderer/http-server';
-import { preRenderSite } from '../prerenderer/prerender';
+import { createStaticFileServer } from '#src/http-server';
+import { preRenderSite } from '#src/prerender';
 
 void (async () => {
   let httpServer: Server | null = null;
@@ -22,11 +22,12 @@ void (async () => {
       .filter(partialUrl => partialUrl.trim())
       .filter(Boolean);
 
-    httpServer = createStaticFileServer(websiteRoot);
+    const finalWebsiteRoot = path.resolve(process.cwd(), websiteRoot);
+    httpServer = createStaticFileServer(finalWebsiteRoot);
 
     const crawled = await preRenderSite({
       startingUrl: 'http://localhost:8080',
-      outputDir: path.join(process.cwd(), websiteRoot),
+      outputDir: finalWebsiteRoot,
       maxConcurrentPages: Number(maxConcurrentPages),
       metaPrerenderOnly: metaPrerenderOnly === '1',
       ...(selectorToWaitFor && { selectorToWaitFor }),

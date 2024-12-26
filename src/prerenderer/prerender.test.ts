@@ -7,8 +7,8 @@ import * as PuppeteerWrapper from './puppeteer';
 const MOCK_PUPPETEER_PAGE = {
   evaluate: vi.fn(),
 } as unknown as Page;
-const MOCKED_HTML_HEAD = `<head><title>Sample title</title></head>`;
-const MOCKED_HTML = `<html>${MOCKED_HTML_HEAD}<body>Some body</body></html>`;
+const MOCKED_HTML_META = `<title>Sample title</title><meta xmlns="http://www.w3.org/1999/xhtml" property="og:type" content="website" />`;
+const MOCKED_HTML = `<html><head>${MOCKED_HTML_META}</head><body>Some body</body></html>`;
 
 class MockedHttpResponse extends HTTPResponse {
   override headers = vi.fn();
@@ -53,7 +53,7 @@ describe('getPageInfo', () => {
     }));
     (
       MOCK_PUPPETEER_PAGE.evaluate as MockedFunction<Page['evaluate']>
-    ).mockImplementation(() => Promise.resolve(MOCKED_HTML_HEAD));
+    ).mockImplementation(() => Promise.resolve(MOCKED_HTML_META));
     (
       PuppeteerWrapper.getLinks as MockedFunction<
         typeof PuppeteerWrapper.getLinks
@@ -61,7 +61,7 @@ describe('getPageInfo', () => {
     ).mockImplementation(() => Promise.resolve(MOCKED_LINK_URLS_FOUND));
     expect(await getPageInfo(MOCK_PUPPETEER_PAGE, MOCKED_URL)).toEqual({
       htmlSource: MOCKED_HTML,
-      renderedHtmlHead: MOCKED_HTML_HEAD,
+      renderedHtmlMeta: MOCKED_HTML_META,
       links: MOCKED_LINK_URLS_FOUND,
     });
     expect(PuppeteerWrapper.goTo).toHaveBeenCalled();

@@ -18,7 +18,6 @@ export const getBrowser = async (
   puppeteer.launch({
     executablePath: await getChromeExecutable(),
     waitForInitialPage: false,
-    headless: 'new',
     ...extraBrowserLaunchOptions,
   });
 

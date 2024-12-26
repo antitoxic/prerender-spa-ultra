@@ -1,0 +1,10 @@
+{
+  "extends": ["@tsconfig/strictest", "@tsconfig/node16"],
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "module": "esnext"
+  },
+  "include": ["./*"]
+}
